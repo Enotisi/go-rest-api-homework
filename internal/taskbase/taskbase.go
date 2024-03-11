@@ -1,13 +1,7 @@
-package main
+package taskbase
 
-import (
-	"fmt"
-	"net/http"
+import "fmt"
 
-	"github.com/go-chi/chi/v5"
-)
-
-// Task ...
 type Task struct {
 	ID           string   `json:"id"`
 	Description  string   `json:"description"`
@@ -39,17 +33,37 @@ var tasks = map[string]Task{
 	},
 }
 
-// Ниже напишите обработчики для каждого эндпоинта
-// ...
+// Метод получения всех задач
+func List() map[string]Task {
+	return tasks
+}
 
-func main() {
-	r := chi.NewRouter()
+// Метод получения задачи по ID
+func ById(id string) (Task, error) {
 
-	// здесь регистрируйте ваши обработчики
-	// ...
+	task, ok := tasks[id]
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
-		fmt.Printf("Ошибка при запуске сервера: %s", err.Error())
-		return
+	if !ok {
+		return Task{}, fmt.Errorf("element was not found")
 	}
+
+	return task, nil
+}
+
+// Метод добавления задачи
+func Add(t Task) {
+
+	tasks[t.ID] = t
+}
+
+// Метод удаления задачи по ID
+func Delete(id string) error {
+
+	if _, ok := tasks[id]; !ok {
+		return fmt.Errorf("element was not found")
+	}
+
+	delete(tasks, id)
+
+	return nil
 }
